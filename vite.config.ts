@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   build: {
@@ -8,11 +8,23 @@ export default defineConfig({
       fileName: () => "main.js",
     },
     rollupOptions: {
-      external: ["obsidian"],
+      external: [
+        "obsidian",
+        "electron",
+        "child_process",
+        "path",
+        "fs",
+        "os",
+        "events",
+        /^node:/,
+      ],
     },
     outDir: ".",
     emptyOutDir: false,
     sourcemap: "inline",
     minify: false,
+  },
+  test: {
+    environment: "node",
   },
 });
