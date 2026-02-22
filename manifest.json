@@ -1,0 +1,10 @@
+{
+  "id": "updown",
+  "name": "updown",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Open the current note as an updown slideshow in the browser.",
+  "author": "Karl",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}
