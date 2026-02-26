@@ -50,19 +50,20 @@ describe("UpdownProcess", () => {
     expect(opts.env).toMatchObject({ PORT: "0" });
   });
 
-  it("passes PLANTUML_JAR env var when configured", async () => {
+  it("passes --plantuml-jar arg when configured", async () => {
     await updown.start("/vault/slides.md", {
       updownPath: "/usr/local/bin/updown",
       plantumlJarPath: "/opt/plantuml.jar",
     });
-    const opts = spawnFn.mock.calls[0][2];
-    expect(opts.env).toMatchObject({ PLANTUML_JAR: "/opt/plantuml.jar" });
+    const args = spawnFn.mock.calls[0][1];
+    expect(args).toContain("--plantuml-jar");
+    expect(args).toContain("/opt/plantuml.jar");
   });
 
-  it("does not set PLANTUML_JAR when not configured", async () => {
+  it("does not pass --plantuml-jar when not configured", async () => {
     await updown.start("/vault/slides.md", { updownPath: "/usr/local/bin/updown" });
-    const opts = spawnFn.mock.calls[0][2];
-    expect(opts.env).not.toHaveProperty("PLANTUML_JAR");
+    const args = spawnFn.mock.calls[0][1];
+    expect(args).not.toContain("--plantuml-jar");
   });
 
   it("polls the health endpoint after finding the URL", async () => {
@@ -91,8 +92,16 @@ describe("UpdownProcess", () => {
     expect(updown.isRunning).toBe(false);
   });
 
-  it("kills the process on stop", async () => {
+  it("calls POST /stop endpoint on graceful stop", async () => {
     await updown.start("/vault/slides.md", { updownPath: "/usr/local/bin/updown" });
+    await updown.stop();
+    expect(fetchFn).toHaveBeenCalledWith("http://localhost:54321/stop", { method: "POST" });
+    expect(mockProc.kill).not.toHaveBeenCalled();
+  });
+
+  it("falls back to kill if /stop endpoint throws", async () => {
+    await updown.start("/vault/slides.md", { updownPath: "/usr/local/bin/updown" });
+    fetchFn.mockRejectedValueOnce(new Error("connection refused"));
     await updown.stop();
     expect(mockProc.kill).toHaveBeenCalled();
   });
@@ -111,7 +120,7 @@ describe("UpdownProcess", () => {
 
     await updown.reload("/vault/new.md", { updownPath: "/usr/local/bin/updown" });
 
-    expect(mockProc.kill).toHaveBeenCalled();
+    expect(fetchFn).toHaveBeenCalledWith("http://localhost:54321/stop", { method: "POST" });
     expect(spawnFn).toHaveBeenLastCalledWith(
       "/usr/local/bin/updown",
       ["/vault/new.md"],

@@ -10,7 +10,7 @@ export type UpdownProcessOptions = {
 };
 
 type SpawnFn = (cmd: string, args: string[], opts: SpawnOptions) => ChildProcess;
-type FetchFn = (url: string) => Promise<{ ok: boolean }>;
+type FetchFn = (url: string, init?: { method?: string }) => Promise<{ ok: boolean }>;
 type OpenBrowserFn = (url: string) => void;
 
 function defaultOpenBrowser(url: string): void {
@@ -48,11 +48,12 @@ export class UpdownProcess {
       PORT: "0",
     };
 
+    const args = [filePath];
     if (options.plantumlJarPath) {
-      env["PLANTUML_JAR"] = options.plantumlJarPath;
+      args.push("--plantuml-jar", options.plantumlJarPath);
     }
 
-    const proc = this.spawnFn(options.updownPath, [filePath], {
+    const proc = this.spawnFn(options.updownPath, args, {
       env,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -69,7 +70,15 @@ export class UpdownProcess {
 
   async stop(): Promise<void> {
     if (this.proc) {
-      this.proc.kill();
+      if (this.url) {
+        try {
+          await this.fetchFn(`${this.url}/stop`, { method: "POST" });
+        } catch {
+          this.proc.kill();
+        }
+      } else {
+        this.proc.kill();
+      }
       this.proc = null;
       this.url = null;
     }
