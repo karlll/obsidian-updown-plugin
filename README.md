@@ -40,6 +40,22 @@ Notes are standard markdown files. Slides are separated by `#`/`##` headings or 
 
 See [FORMAT.md](https://github.com/karlll/updown/blob/main/FORMAT.md) in the updown repository for the full format reference, covering front matter, meta-fences, multi-column layouts, code blocks, and diagrams.
 
+## Troubleshooting
+
+### macOS: "updown is damaged and can't be opened"
+
+macOS Gatekeeper may quarantine the downloaded `updown` binary and display the message:
+
+> *"updown is damaged and can't be opened. You should move it to the Trash."*
+
+To fix this, remove the quarantine attribute by running the following command in the directory where you placed the binary:
+
+```sh
+xattr -c updown
+```
+
+After running this command you should be able to start the slideshow normally.
+
 ## More information
 
 See the [updown project](https://github.com/karlll/updown) for the full feature list, available themes, and diagram support.
