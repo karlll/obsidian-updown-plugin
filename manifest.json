@@ -3,8 +3,8 @@
   "name": "updown",
   "version": "0.1.0",
   "minAppVersion": "1.4.0",
-  "description": "Open the current note as an updown slideshow in the browser.",
-  "author": "Karl",
-  "authorUrl": "",
+  "description": "Open the current note as an updown slideshow in the browser. Requires updown (https://github.com/karlll/updown) binary",
+  "author": "Karl Larsaeus",
+  "authorUrl": "https://github.com/karlll",
   "isDesktopOnly": true
 }
