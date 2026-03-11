@@ -51,7 +51,7 @@ macOS Gatekeeper may quarantine the downloaded `updown` binary and display the m
 To fix this, remove the quarantine attribute by running the following command in the directory where you placed the binary:
 
 ```sh
-xattr -c updown
+xattr -d com.apple.quarantine ./updown
 ```
 
 After running this command you should be able to start the slideshow normally.
